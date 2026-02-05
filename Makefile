@@ -4,20 +4,20 @@ PACKER_FILE=nginx.pkr.hcl
 ANSIBLE_PLAYBOOK=deploy.yml
 PYTHON_PATH=/home/codespace/.python/current/bin/python3
 
-.PHONY: all build import deploy clean
+.PHONY: all build import deploy clean forward
 
 all: build import deploy
 
 build:
 	@echo "### Building image with Packer..."
-	packer build $(PACKER_FILE)
+	packer build -force $(PACKER_FILE)
 
 import:
 	@echo "### Saving image to tar file..."
 	docker save $(IMAGE_NAME):latest -o image_tmp.tar
 	@echo "### Importing tar file to K3d..."
 	k3d image import image_tmp.tar --cluster $(CLUSTER_NAME)
-	@echo "### Cleaning up..."
+	@echo "### Cleaning up tar..."
 	rm image_tmp.tar
 
 deploy:
@@ -25,9 +25,11 @@ deploy:
 	ansible-playbook $(ANSIBLE_PLAYBOOK) -e "ansible_python_interpreter=$(PYTHON_PATH)"
 
 forward:
-	@echo "### Starting Port-Forward on 8081..."
+	@echo "### Cleaning old port-forward and starting new one on 8081..."
+	-pkill -f "port-forward"
 	kubectl port-forward svc/custom-nginx-service 8081:80 >/tmp/nginx-custom.log 2>&1 &
 
 clean:
 	@echo "### Cleaning up deployment..."
-	kubectl delete -f $(ANSIBLE_PLAYBOOK) || true
+	kubectl delete deployment custom-nginx || true
+	kubectl delete svc custom-nginx-service || true
