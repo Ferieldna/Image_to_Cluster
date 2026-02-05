@@ -1,46 +1,29 @@
-CLUSTER_NAME=lab
-NAMESPACE=demo
-SERVICE_NAME=nginx-custom-service
-PORT=8100
 IMAGE_NAME=my-nginx-custom
+CLUSTER_NAME=lab
+PACKER_FILE=nginx.pkr.hcl
+ANSIBLE_PLAYBOOK=deploy.yml
+PYTHON_PATH=/home/codespace/.python/current/bin/python3
 
-.DEFAULT_GOAL := all
+.PHONY: all build import deploy clean
 
-.PHONY: all cluster build import deploy access clean
-
-all:
-	@echo "🚀 Déploiement du projet en un clic..."
-	@$(MAKE) cluster
-	@$(MAKE) build
-	@$(MAKE) import
-	@$(MAKE) deploy
-	@echo ""
-	@echo "TP entièrement déployé"
-	@echo "Accès à l'application :"
-	@echo "Lancez : make access"
-	@echo "Puis ouvrez le port $(PORT) dans l’onglet PORTS (Visibility: Public)"
-
-cluster:
-	@echo "Création du cluster K3d..."
-	k3d cluster create $(CLUSTER_NAME) --servers 1 --agents 2 || echo "Cluster déjà existant"
+all: build import deploy
 
 build:
-	@echo "Construction de l'image avec Packer..."
-	packer init nginx.pkr.hcl
-	packer build nginx.pkr.hcl
+	@echo "### Building image with Packer..."
+	packer build $(PACKER_FILE)
 
 import:
-	@echo "Importation de l'image dans K3d..."
+	@echo "### Importing image to K3d..."
 	k3d image import $(IMAGE_NAME):latest -c $(CLUSTER_NAME)
 
 deploy:
-	@echo "Déploiement Kubernetes via Ansible..."
-	ansible-playbook deploy.yml -e "ansible_python_interpreter=/usr/bin/python3"
+	@echo "### Deploying to Kubernetes via Ansible..."
+	ansible-playbook $(ANSIBLE_PLAYBOOK) -e "ansible_python_interpreter=$(PYTHON_PATH)"
 
-access:
-	@echo "Ouverture du tunnel vers l'application..."
-	kubectl port-forward svc/$(SERVICE_NAME) $(PORT):80 -n $(NAMESPACE)
+forward:
+	@echo "### Starting Port-Forward on 8081..."
+	kubectl port-forward svc/custom-nginx-service 8081:80 >/tmp/nginx-custom.log 2>&1 &
 
 clean:
-	@echo "Suppression du cluster et nettoyage..."
-	k3d cluster delete $(CLUSTER_NAME)
+	@echo "### Cleaning up deployment..."
+	kubectl delete -f $(ANSIBLE_PLAYBOOK) || true
