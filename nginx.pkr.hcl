@@ -22,6 +22,6 @@ build {
 
   post-processor "docker-tag" {
     repository = "my-custom-nginx"
-    tags       = ["latest"]
+    tags       = ["latest"] 
   }
 }
