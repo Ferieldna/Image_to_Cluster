@@ -26,8 +26,17 @@ Prérequis
 Utilisation
 
 Déploiement Complet
-Lancer le tunnel (Port-Forward) :
+Lancer le tunnel (Port-Forward) après avoir installé k3d, Packer et Ansible :
 ```bash
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.6.0 bash
+
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt-get update && sudo apt-get install packer
+
+pip install ansible kubernetes
+ansible-galaxy collection install kubernetes.core
+
 make forward
 
 ```
