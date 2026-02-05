@@ -13,8 +13,12 @@ build:
 	packer build $(PACKER_FILE)
 
 import:
-	@echo "### Importing image to K3d..."
-	docker save $(IMAGE_NAME):latest | k3d image import - --cluster $(CLUSTER_NAME)
+	@echo "### Saving image to tar file..."
+	docker save $(IMAGE_NAME):latest -o image_tmp.tar
+	@echo "### Importing tar file to K3d..."
+	k3d image import image_tmp.tar --cluster $(CLUSTER_NAME)
+	@echo "### Cleaning up..."
+	rm image_tmp.tar
 
 deploy:
 	@echo "### Deploying to Kubernetes via Ansible..."
