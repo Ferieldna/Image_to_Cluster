@@ -6,7 +6,6 @@
       kubernetes.core.k8s:
         state: present
         definition:
-
           - apiVersion: apps/v1
             kind: Deployment
             metadata:
@@ -23,7 +22,7 @@
                 spec:
                   containers:
                   - name: nginx
-                    image: my-custom-nginx:latest
+                    image: my-nginx-custom:latest
                     imagePullPolicy: Never
                     ports:
                     - containerPort: 80
