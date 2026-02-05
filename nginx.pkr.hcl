@@ -13,7 +13,7 @@ source "docker" "nginx_custom" {
 }
 
 build {
-  name = "my-custom-nginx"
+  name = "my-nginx-custom"
   sources = ["source.docker.nginx_custom"]
 
   provisioner "file" {
