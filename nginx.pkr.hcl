@@ -1,19 +1,19 @@
 packer {
   required_plugins {
     docker = {
-      source  = "github.com/hashicorp/docker"
       version = ">= 1.0.0"
+      source  = "github.com/hashicorp/docker"
     }
   }
 }
 
-source "docker" "nginx_custom" {
-  image  = "nginx:latest"
+source "docker" "nginx" {
+  image  = "nginx:alpine"
   commit = true
 }
 
 build {
-  sources = ["source.docker.nginx_custom"]
+  sources = ["source.docker.nginx"]
 
   provisioner "file" {
     source      = "index.html"
@@ -21,7 +21,7 @@ build {
   }
 
   post-processor "docker-tag" {
-    repository = "my-nginx-custom"
-    tag        = ["latest"]
+    repository = "my-custom-nginx"
+    tags       = ["latest"]
   }
 }
