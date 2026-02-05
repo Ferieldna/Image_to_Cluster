@@ -1,8 +1,9 @@
-- name: Deploy Custom Nginx to K3d
+---
+- name: Deploiement de mon Nginx custom
   hosts: localhost
   connection: local
   tasks:
-    - name: Apply Nginx Deployment and Service
+    - name: Création des ressources Kubernetes (Deployment et Service)
       kubernetes.core.k8s:
         state: present
         definition:
@@ -10,6 +11,7 @@
             kind: Deployment
             metadata:
               name: custom-nginx
+              namespace: default
             spec:
               replicas: 2
               selector:
@@ -31,6 +33,7 @@
             kind: Service
             metadata:
               name: custom-nginx-service
+              namespace: default
             spec:
               type: NodePort
               selector:
