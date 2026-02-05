@@ -3,9 +3,10 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Appliquer la configuration Kubernetes (Deployment + Service)
+    - name: Appliquer la configuration Kubernetes
       kubernetes.core.k8s:
         state: present
+        namespace: default  
         definition:
           - apiVersion: apps/v1
             kind: Deployment
@@ -41,4 +42,3 @@
               ports:
               - port: 80
                 targetPort: 80
-                nodePort: 30080
