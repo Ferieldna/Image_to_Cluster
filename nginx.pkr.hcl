@@ -1,8 +1,8 @@
 packer {
   required_plugins {
     docker = {
-      version = ">= 1.0.8"
       source  = "github.com/hashicorp/docker"
+      version = ">= 1.0.0"
     }
   }
 }
@@ -13,7 +13,6 @@ source "docker" "nginx_custom" {
 }
 
 build {
-  name = "my-nginx-custom"
   sources = ["source.docker.nginx_custom"]
 
   provisioner "file" {
