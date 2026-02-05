@@ -25,7 +25,6 @@
                 imagePullPolicy: Never
                 ports:
                 - containerPort: 80
-        EOF
 
     - name: Appliquer le Service via Shell
       shell: |
@@ -42,4 +41,3 @@
           - port: 80
             targetPort: 80
             nodePort: 30080
-        EOF
