@@ -13,8 +13,8 @@ build:
 	packer build $(PACKER_FILE)
 
 import:
-	@echo "### Importing image to K3d (stream mode)..."
-	docker save $(IMAGE_NAME):latest | k3d image import -c $(CLUSTER_NAME) -
+	@echo "### Importing image to K3d..."
+	docker save $(IMAGE_NAME):latest | k3d image import - --cluster $(CLUSTER_NAME)
 
 deploy:
 	@echo "### Deploying to Kubernetes via Ansible..."
